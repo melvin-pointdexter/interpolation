@@ -1,3 +1,4 @@
+# Github : https://github.com/melvin-pointdexter/interpolation
 
 def linear(points, x):
     for index in range(len(points) - 1):
@@ -22,37 +23,31 @@ def cubic_spline(points, x):
     length = len(points)
     h = [points[i + 1][0] - points[i][0] for i in range(length - 1)]
 
-    # calculate the alpha
     alpha = [0] * (length - 1)
     for i in range(1, length - 1):
         alpha[i] = (3 / h[i]) * (points[i + 1][1] - points[i][1]) - (3 / h[i - 1]) * (points[i][1] - points[i - 1][1])
 
-    # Tridiagonal system arrays
     one = [1] * length
     second = [0] * length
     third = [0] * length
-
     for i in range(1, length - 1):
         one[i] = 2 * (points[i + 1][0] - points[i - 1][0]) - h[i - 1] * second[i - 1]
         second[i] = h[i] / one[i]
         third[i] = (alpha[i] - h[i - 1] * third[i - 1]) / one[i]
 
-    # Back-substitution
     c = [0] * length
     b = [0] * (length - 1)
     d = [0] * (length - 1)
-
     for j in range(length - 2, -1, -1):
         c[j] = third[j] - second[j] * c[j + 1]
         b[j] = ((points[j + 1][1] - points[j][1]) / h[j]) - h[j] * (c[j + 1] + 2 * c[j]) / 3
         d[j] = (c[j + 1] - c[j]) / (3 * h[j])
 
-    # Find interval for x
     i = 0
     if x < points[0][0]:
         i = 0
     elif x > points[-1][0]:
-        i = n - 2
+        i = length - 2
     else:
         for j in range(length - 1):
             if points[j][0] <= x <= points[j + 1][0]:
